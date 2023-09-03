@@ -19,6 +19,8 @@ var ctx = canvas.getContext("2d");
 var x = 225, y = 255;
 var dir = 0;
 var t_x=600 , t_y=600;
+var w_x=300 , w_y=80;
+var speed = 10;
 
 document.addEventListener ("keydown",(e) => {
     
@@ -48,22 +50,22 @@ function update(){
 
     switch(dir){
         case 87:
-            y -= 10;
+            y -= speed;
             if(y < -50){y = 1100;}
         break;
 
         case 83:
-            y += 10;
+            y += speed;
             if(y > 1100){y = -50;}
         break;
 
         case 68:
-            x += 10;
+            x += speed;
             if(x > 1100){x = -50;}
         break;
 
         case 65:
-            x -= 10;
+            x -= speed;
             if(x < -50){x = 1100;}
         break;
     };
@@ -76,6 +78,30 @@ function update(){
         console.log("hola");
         t_x = Math.random() * (900)
         t_y = Math.random() * (900)
+        speed += 5;
+    }
+
+    if(x < w_x + 350 &&
+       x + 50 > w_x &&   
+       y < w_y + 50 && 
+       y + 50 > w_y) 
+    {
+       
+       switch(dir){
+        case 87:
+            y += speed;
+        break;
+        case 83:
+            y -= speed;          
+        break;
+        case 68:
+            x -= speed;    
+        break;
+        case 65:
+            x += speed; 
+        break;
+    };
+    dir = 0;
     }
 
 
@@ -94,6 +120,9 @@ function repaint(){
 
     ctx.fillStyle = "black";
     ctx.fillRect (t_x,t_y,40,40)
+
+    ctx.fillStyle = "gray";
+    ctx.fillRect(w_x,w_y,350,50)
 }
 
 function random_rgba() {
