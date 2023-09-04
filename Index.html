@@ -7,291 +7,141 @@
 </head>
 
 <body>
-   <canvas id="canvas" width="1100" height="1100" >  </canvas>
-   <style> #canvas{
-    border: 2px solid #000
+   <canvas id="canvas" width="1100" height="1100"></canvas>
+   <style> 
+    #canvas {
+        border: 2px solid #000;
     }
-    </style>
+   </style>
     
-    <script >
+    <script>
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
-var x = 225, y = 255;
 var dir = 0;
-var t_x=600 , t_y=600;
-var w_x=300 , w_y=80;
 var speed = 10;
+var wall = [];
+class Rectangulo {
+    constructor(x, y, w, h, c) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.c = c;
+    }
+    paint(ctx) {
+        ctx.fillStyle = this.c;
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+        ctx.strokeRect(this.x, this.y, this.w, this.h);
+    }
+    Touch(target) {
+        if (this.x < target.x + target.w &&
+            this.x + this.w > target.x &&
+            this.y < target.y + target.h &&
+            this.y + this.h > target.y) {
+            return true;
+        }
+        return false;
+    }
+}
 
-document.addEventListener ("keydown",(e) => {
-    
+const player = new Rectangulo(255, 255, 50, 50, "black");
+const target = new Rectangulo(600, 600, 50, 50, "black");
 
-    switch(e.keyCode){
+wall.push(new Rectangulo(300, 80, 350, 50, "gray"));
+wall.push(new Rectangulo(300, 480, 350, 50, "gray"));
+
+document.addEventListener("keydown", (e) => {
+    switch (e.keyCode) {
         case 87:
             dir = e.keyCode;
-        break;
+            break;
 
         case 83:
-        dir = e.keyCode;
-        break;
+            dir = e.keyCode;
+            break;
 
         case 68:
-        dir = e.keyCode;
-        break;
+            dir = e.keyCode;
+            break;
 
         case 65:
-        dir = e.keyCode;
-        break;
+            dir = e.keyCode;
+            break;
     };
-
-    //update();
-
 });
-function update(){
 
-    switch(dir){
+function update() {
+    switch (dir) {
         case 87:
-            y -= speed;
-            if(y < -50){y = 1100;}
-        break;
+            player.y -= speed;
+            if (player.y < -50) player.y = 1100;
+            break;
 
         case 83:
-            y += speed;
-            if(y > 1100){y = -50;}
-        break;
+            player.y += speed;
+            if (player.y > 1100) player.y = -50;
+            break;
 
         case 68:
-            x += speed;
-            if(x > 1100){x = -50;}
-        break;
+            player.x += speed;
+            if (player.x > 1100) player.x = -50;
+            break;
 
         case 65:
-            x -= speed;
-            if(x < -50){x = 1100;}
-        break;
+            player.x -= speed;
+            if (player.x < -50) player.x = 1100;
+            break;
     };
 
-    if(x < t_x + 40 &&
-       x + 50 > t_x &&   
-       y < t_y + 40 && 
-       y + 50 > t_y) 
-    {
-        console.log("hola");
-        t_x = Math.random() * (900)
-        t_y = Math.random() * (900)
+    if (player.Touch(target)) {
+        target.x = Math.random() * 500;
+        target.y = Math.random() * 500;
         speed += 5;
     }
 
-    if(x < w_x + 350 &&
-       x + 50 > w_x &&   
-       y < w_y + 50 && 
-       y + 50 > w_y) 
-    {
-       
-       switch(dir){
-        case 87:
-            y += speed;
-        break;
-        case 83:
-            y -= speed;          
-        break;
-        case 68:
-            x -= speed;    
-        break;
-        case 65:
-            x += speed; 
-        break;
-    };
-    dir = 0;
+    for (var i = 0; i < wall.length; i++) {
+        if (player.Touch(wall[i])) {
+            switch (dir) {
+                case 87:
+                    player.y += speed;
+                    break;
+                case 83:
+                    player.y -= speed;
+                    break;
+                case 68:
+                    player.x -= speed;
+                    break;
+                case 65:
+                    player.x += speed;
+                    break;
+            };
+            dir = 0;
+        }
     }
-
 
     repaint();
     window.requestAnimationFrame(update);
 }
 
-function repaint(){
-
+function repaint() {
     ctx.fillStyle = "white";
-    ctx.fillRect (0,0,1100,1100);
+    ctx.fillRect(0, 0, 1100, 1100);
 
-    ctx.fillStyle = random_rgba();
-    ctx.fillRect(x,y,50,50)
-    ctx.strokeRect(x,y,50,50)
+    player.c = random_rgba();
+    player.paint(ctx);
 
-    ctx.fillStyle = "black";
-    ctx.fillRect (t_x,t_y,40,40)
-
-    ctx.fillStyle = "gray";
-    ctx.fillRect(w_x,w_y,350,50)
+    target.paint(ctx);
+    for (var i = 0; i < wall.length; i++) {
+        wall[i].paint(ctx);
+    }
 }
 
 function random_rgba() {
     var o = Math.round, r = Math.random, s = 255;
-    return 'rgba(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ',' + r().toFixed(1) + ')';
+    return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
 }
-
-window.requestAnimationFrame = (function () {
-    return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        function (callback) {
-            window.setTimeout(callback, 17);
-        };
-}());
 
 window.requestAnimationFrame(update);
-/*var figura = true;
-var color = "rgba(13,242,23,0.5)";
-var dibujo = false;
-
-
-
-canvas.addEventListener("click", (e) => {
-    console.log("Hola")
-    console.log(e);
-    ctx.beginPath();
-    ctx.fill(); 
-    ctx.arc(e.layerX, e.layerY, 90, 40, 0, 2 * Math.PI);
-    ctx.closePath();
-    if(figura){
-            ctx.beginPath();
-            ctx.arc(e.layerX,e.layerY,90, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.stroke();}
-            
-            else{
-            ctx.fillRect(e.layerX-50,e.layerY-50,120,120)
-            ctx.strokeRect(e.layerX-50,e.layerY-50,120,120)
-        }
-    });
-
-    function random_rgba() {
-    var o = Math.round, r = Math.random, s = 255;
-    return 'rgba(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ',' + r().toFixed(1) + ')';
-}
-
-canvas.addEventListener("mousedown", (e) => {
-
-dibujo = true;
-ctx.beginPath();
-ctx.moveTo(e.layerX, e.layerY);
-
-});
-canvas.addEventListener("mousemove", (e) => {
-        if (!dibujo) return;
-
-        ctx.lineTo(e.layerX, e.layerY);
-        ctx.stroke();
-    });
-
-    canvas.addEventListener("mouseup", () => {
-        dibujo = false;
-        ctx.closePath();
-    });
-
-    canvas.addEventListener("mouseover",  (e) => {
-        console.log("mouseover")
-
-        ctx.fillStyle = color;
-        color = random_rgba();
-});
-
-    canvas.addEventListener("mouseout",  (e) => {
-        console.log("mouseout")
-        figura =!figura;  
-    });
-
-
-/*ctx.fillStyle = "green";
-ctx.fillRect(10, 10, 100, 100);
-
-ctx.fillStyle = "blue";
-ctx.fillRect(90, 90, 100, 100);
-
-ctx.fillStyle = "red";
-ctx.fillRect(170, 170, 100, 100);
-
-//linea 
-ctx.beginPath();
-ctx.moveTo(185,10);
-ctx.lineTo(185, 65);
-ctx.lineTo(125, 65);
-ctx.fill();
-ctx.stroke();
-ctx.closePath();
-
-
-ctx.beginPath();
-ctx.moveTo(312,365);
-ctx.lineTo(400,460);
-ctx.lineTo(300,460);
-ctx.fill();
-ctx.moveTo(400,400);
-ctx.lineTo(280,260);
-ctx.stroke();
-ctx.closePath();
-
-//circulo
-ctx.fillStyle = "blue"
-ctx.strokeStyle = "red"
-ctx.beginPath();
-ctx.arc(435, 110, 40, 0, 2 * Math.PI);
-ctx.fill();
-ctx.stroke();
-ctx.closePath();
-
-ctx.strokeStyle = "red"
-ctx.beginPath();
-ctx.arc(295, 110, 40, 0, 2 * Math.PI);
-ctx.stroke();
-ctx.closePath();
-
-//texto
-ctx.beginPath();
-ctx.font = "30px Georgia";
-ctx.fillText("Hola mundo", 40, 350);
-ctx.closePath();
-
-ctx.strokeStyle = "#00275a"
-ctx.beginPath();
-ctx.moveTo(400,460);
-ctx.lineTo(540,540);
-ctx.stroke();
-ctx.closePath();
-
-//rectangulo de colores
-
-ctx.beginPath();
-const grd = ctx.createLinearGradient(100, 220, 40, 248);
-grd.addColorStop(0, "blue");
-grd.addColorStop(0.5, "yellow");
-grd.addColorStop(1, "red");
-
-
-ctx.fillStyle = grd;
-ctx.fillRect(100, 500, 250, 130);
-ctx.closePath();
-
-//Circulo de colores
-ctx.beginPath();
-const rad = ctx.createRadialGradient(175,845, 100, 175, 830, 165);
-rad.addColorStop(0, "white");
-rad.addColorStop(0.1, "black");
-rad.addColorStop(1, "gray");
-
-ctx.fillStyle = rad;
-ctx.fillRect(10, 700, 360, 250);
-
-ctx.closePath();
-
-const img = new Image();
-img.src = "duck.jpg";
-
-img.onload = function(){
-ctx.drawImage(img, 600, 80, 250, 250);
-}*/
-
-
 </script>
 </body>
 </html>
