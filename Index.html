@@ -7,7 +7,7 @@
 </head>
 
 <body>
-   <canvas id="canvas" width="1100" height="1100"></canvas>
+   <canvas id="canvas" width="1100" height="800"></canvas>
    <style> 
     #canvas {
         border: 2px solid #000;
@@ -20,6 +20,8 @@ var ctx = canvas.getContext("2d");
 var dir = 0;
 var speed = 10;
 var wall = [];
+var pause = false;
+var score = 0;
 class Rectangulo {
     constructor(x, y, w, h, c) {
         this.x = x;
@@ -53,24 +55,29 @@ wall.push(new Rectangulo(300, 480, 350, 50, "gray"));
 document.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
         case 87:
-            dir = e.keyCode;
+            if (!pause) dir = e.keyCode;
             break;
 
         case 83:
-            dir = e.keyCode;
+            if (!pause) dir = e.keyCode;
             break;
 
         case 68:
-            dir = e.keyCode;
+            if (!pause) dir = e.keyCode;
             break;
 
         case 65:
-            dir = e.keyCode;
+            if (!pause) dir = e.keyCode;
             break;
+
+        case 32:
+            pause = !pause;
+                break;
     };
 });
 
 function update() {
+    if (!pause){
     switch (dir) {
         case 87:
             player.y -= speed;
@@ -97,6 +104,7 @@ function update() {
         target.x = Math.random() * 500;
         target.y = Math.random() * 500;
         speed += 5;
+        score +=1;
     }
 
     for (var i = 0; i < wall.length; i++) {
@@ -118,14 +126,20 @@ function update() {
             dir = 0;
         }
     }
-
+}
     repaint();
     window.requestAnimationFrame(update);
 }
 
 function repaint() {
+
+    if(!pause){
     ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, 1100, 1100);
+    ctx.fillRect (0, 0, 1100, 1100);
+
+    ctx.font = "30px Verdana";
+    ctx.fillStyle = "green";
+    ctx.fillText ("SCORE: " +score,950,790)
 
     player.c = random_rgba();
     player.paint(ctx);
@@ -134,8 +148,21 @@ function repaint() {
     for (var i = 0; i < wall.length; i++) {
         wall[i].paint(ctx);
     }
-}
+}else{
 
+    ctx.fillStyle = "black";
+    ctx.fillRect (0,0,1100,1100);
+
+    ctx.font = "30px Verdana";
+    ctx.fillStyle = "green";
+    ctx.fillText ("SCORE: " +score,950,790)
+
+    ctx.font = "50px Verdana";
+    ctx.fillStyle = "white";
+    ctx.fillText ("P A U S A", 430, 550)
+
+}
+}
 function random_rgba() {
     var o = Math.round, r = Math.random, s = 255;
     return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
