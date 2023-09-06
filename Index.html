@@ -22,6 +22,13 @@ var speed = 10;
 var wall = [];
 var pause = false;
 var score = 0;
+var image = new Image();
+image.src = "lobo.png";
+var image2 = new Image();
+image2.src = "liebre.png";
+var audio = new Audio();
+audio.src = "mordida.mp3";
+
 class Rectangulo {
     constructor(x, y, w, h, c) {
         this.x = x;
@@ -48,6 +55,7 @@ class Rectangulo {
 
 const player = new Rectangulo(255, 255, 50, 50, "black");
 const target = new Rectangulo(600, 600, 50, 50, "black");
+
 
 wall.push(new Rectangulo(300, 80, 350, 50, "gray"));
 wall.push(new Rectangulo(300, 480, 350, 50, "gray"));
@@ -105,6 +113,7 @@ function update() {
         target.y = Math.random() * 500;
         speed += 5;
         score +=1;
+        audio.play();
     }
 
     for (var i = 0; i < wall.length; i++) {
@@ -139,12 +148,14 @@ function repaint() {
 
     ctx.font = "30px Verdana";
     ctx.fillStyle = "green";
-    ctx.fillText ("SCORE: " +score,950,790)
+    ctx.fillText ("SCORE: " +score,920,790)
 
     player.c = random_rgba();
-    player.paint(ctx);
+    ctx.drawImage (image, player.x, player.y,60,60);
 
-    target.paint(ctx);
+    
+    ctx.drawImage(image2, target.x, target.y, 60, 60);
+    
     for (var i = 0; i < wall.length; i++) {
         wall[i].paint(ctx);
     }
@@ -155,7 +166,7 @@ function repaint() {
 
     ctx.font = "30px Verdana";
     ctx.fillStyle = "green";
-    ctx.fillText ("SCORE: " +score,950,790)
+    ctx.fillText ("SCORE: " +score,920,790)
 
     ctx.font = "50px Verdana";
     ctx.fillStyle = "white";
